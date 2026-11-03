@@ -44,4 +44,22 @@ T["build path of valid file"] = function()
   neq(match, nil)
 end
 
+T["parent of a resource is the sibling kustomization"] = function()
+  vim.cmd("e tests/kustomize/test_data/parent/base/deployment.yaml")
+  local get = resources.find_parents({ "." })
+  neq(string.find(get[1], "test_data/parent/base/kustomization.yaml$"), nil)
+end
+
+T["parent of a kustomization is the referenced base"] = function()
+  vim.cmd("e tests/kustomize/test_data/parent/overlay/kustomization.yaml")
+  local get = resources.find_parents({ "." })
+  eq(#get, 1)
+  neq(string.find(get[1], "test_data/parent/base/kustomization.yaml$"), nil)
+end
+
+T["base kustomization has no parent"] = function()
+  vim.cmd("e tests/kustomize/test_data/parent/base/kustomization.yaml")
+  eq(resources.find_parents({ "." }), {})
+end
+
 return T

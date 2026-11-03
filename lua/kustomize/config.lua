@@ -42,12 +42,16 @@ local M = {}
 ---@field validate? KustomizeRunCommandConfig
 ---@field deprecations? KustomizeRunCommandConfig
 
+---@class KustomizeParentConfig
+---@field search_path? string[] Directories (relative to a resource) searched for its kustomization file
+
 ---@class KustomizeConfig
 ---@field enable_key_mappings? boolean
 ---@field enable_lua_snip? boolean
 ---@field build? KustomizeBuildConfig
 ---@field kinds? KustomizeKindsConfig
 ---@field run? KustomizeRunConfig
+---@field parent? KustomizeParentConfig
 
 ---@type KustomizeConfig
 M.options = {
@@ -77,6 +81,7 @@ M.options = {
     },
     additional_args = {},
   },
+  parent = { search_path = { "." } },
   kinds = { auto_close = false, show_filepath = true, show_line = true, exclude_pattern = {} },
   -- the last argument of a run command is always a file with the current buffer's content
   run = {

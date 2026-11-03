@@ -60,7 +60,8 @@ Run `:checkhealth kustomize` for a health check.
 | ---- | ------------ | ---------------------- | -------------------------- |
 | n    | \<leader\>kb | Kustomize build        | `:KustomizeBuild`          |
 | n    | \<leader\>kk | List kinds             | `:KustomizeListKinds`      |
-| n    | \<leader\>kp | Print resources        | `:KustomizePrintResources` |
+| n    | \<leader\>kp | Go to parent kustomization | `:KustomizeParent` |
+| n    | \<leader\>kP | Print resources        | `:KustomizePrintResources` |
 | n    | \<leader\>kl | List resources         | `:KustomizeListResources`  |
 | n    | \<leader\>kv | Validate file          | `:KustomizeValidate`       |
 | n    | \<leader\>kd | Check API deprecations | `:KustomizeDeprecations`   |

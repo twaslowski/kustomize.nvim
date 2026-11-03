@@ -182,4 +182,64 @@ M.print = function()
   vim.api.nvim_buf_set_lines(0, row, row, true, resourceList)
 end
 
+---returns the kustomization file in dir, if any
+---@param dir string
+---@return string|nil
+local function kustomization_in(dir)
+  for _, name in ipairs({ "kustomization.yaml", "kustomization.yml" }) do
+    local p = vim.fs.joinpath(dir, name)
+    if vim.uv.fs_stat(p) then
+      return p
+    end
+  end
+end
+
+---finds parent kustomization files of the current buffer
+---@param search_path string[] directories relative to the buffer, used for non-kustomization files
+---@return string[]
+M.find_parents = function(search_path)
+  local bufName = vim.api.nvim_buf_get_name(0)
+  local dirName = vim.fs.dirname(bufName)
+  local parents = {}
+  if utils.is_kustomization_yaml(vim.fs.basename(bufName)) then
+    local ok, items = pcall(M.find_resources, 0)
+    if not ok then
+      utils.error("could not parse buffer with tree-sitter")
+      return parents
+    end
+    for _, r in ipairs(items) do
+      local k = kustomization_in(vim.fs.joinpath(dirName, r))
+      if k then
+        table.insert(parents, vim.fs.normalize(k))
+      end
+    end
+  else
+    -- ponytail: picks the first kustomization on the search path without checking its resources list
+    for _, rel in ipairs(search_path) do
+      local k = kustomization_in(vim.fs.joinpath(dirName, rel))
+      if k then
+        return { vim.fs.normalize(k) }
+      end
+    end
+  end
+  return parents
+end
+
+---opens the parent kustomization of the current buffer
+---@param search_path string[]
+M.parent = function(search_path)
+  local parents = M.find_parents(search_path)
+  if #parents == 0 then
+    utils.warn("could not find a parent kustomization")
+  elseif #parents == 1 then
+    vim.cmd("edit " .. vim.fn.fnameescape(parents[1]))
+  else
+    vim.ui.select(parents, { prompt = "Select parent kustomization:" }, function(selected)
+      if selected then
+        vim.cmd("edit " .. vim.fn.fnameescape(selected))
+      end
+    end)
+  end
+end
+
 return M

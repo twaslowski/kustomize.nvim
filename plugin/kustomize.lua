@@ -64,6 +64,13 @@ end, {
   nargs = 0,
 })
 
+vim.api.nvim_create_user_command("KustomizeParent", function()
+  require("kustomize.resources").parent(config.options.parent.search_path)
+end, {
+  desc = "Go to the parent kustomization.yaml",
+  nargs = 0,
+})
+
 vim.api.nvim_create_user_command("KustomizeValidate", function()
   local cmd = config.options.run["validate"].cmd
   local args = config.options.run["validate"].args

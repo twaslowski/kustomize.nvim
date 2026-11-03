@@ -61,7 +61,8 @@ DEFAULT MAPPINGS                             *kustomize.nvim-default-mappings*
 
   n      <leader>kk    List kinds               :KustomizeListKinds
 
-  n      <leader>kp    Print resources          :KustomizePrintResources
+  n      <leader>kp    Go to parent             :KustomizeParent
+  n      <leader>kP    Print resources          :KustomizePrintResources
 
   n      <leader>kl    List resources           :KustomizeListResources
 
