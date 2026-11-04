@@ -62,4 +62,16 @@ T["base kustomization has no parent"] = function()
   eq(resources.find_parents({ "." }), {})
 end
 
+T["children of a base are the overlays referencing it"] = function()
+  vim.cmd("e tests/kustomize/test_data/parent/base/kustomization.yaml")
+  local get = resources.find_children("tests/kustomize/test_data/parent")
+  eq(#get, 1)
+  neq(string.find(get[1], "test_data/parent/overlay/kustomization.yaml$"), nil)
+end
+
+T["an overlay has no children"] = function()
+  vim.cmd("e tests/kustomize/test_data/parent/overlay/kustomization.yaml")
+  eq(resources.find_children("tests/kustomize/test_data/parent"), {})
+end
+
 return T

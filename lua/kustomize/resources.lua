@@ -225,20 +225,77 @@ M.find_parents = function(search_path)
   return parents
 end
 
+---edits the single path, or lets the user pick one
+---@param paths string[]
+---@param prompt string
+local function edit_one_of(paths, prompt)
+  if #paths == 1 then
+    vim.cmd("edit " .. vim.fn.fnameescape(paths[1]))
+  else
+    vim.ui.select(paths, { prompt = prompt }, function(selected)
+      if selected then
+        vim.cmd("edit " .. vim.fn.fnameescape(selected))
+      end
+    end)
+  end
+end
+
 ---opens the parent kustomization of the current buffer
 ---@param search_path string[]
 M.parent = function(search_path)
   local parents = M.find_parents(search_path)
   if #parents == 0 then
     utils.warn("could not find a parent kustomization")
-  elseif #parents == 1 then
-    vim.cmd("edit " .. vim.fn.fnameescape(parents[1]))
   else
-    vim.ui.select(parents, { prompt = "Select parent kustomization:" }, function(selected)
-      if selected then
-        vim.cmd("edit " .. vim.fn.fnameescape(selected))
+    edit_one_of(parents, "Select parent kustomization:")
+  end
+end
+
+---finds kustomizations that reference the current buffer's directory
+---@param dir? string directory to search for references (defaults to the buffer's git root or cwd)
+---@return string[]
+M.find_children = function(dir)
+  if not utils.check_exec("rg") then
+    utils.error("ripgrep (rg) is required to find child kustomizations")
+    return {}
+  end
+  local target = vim.fs.normalize(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
+  local root = dir or vim.fs.root(0, { ".git" }) or vim.fn.getcwd()
+  -- ponytail: matches on the target's basename, so a reference like "../.." is missed
+  local out = vim.system({
+    "rg",
+    "--no-heading",
+    "--no-line-number",
+    "--fixed-strings",
+    "--glob",
+    "kustomization.y*ml",
+    vim.fs.basename(target),
+    root,
+  }, { text = true }):wait()
+
+  local children = {}
+  local seen = {}
+  for _, line in ipairs(vim.split(out.stdout or "", "\n", { trimempty = true })) do
+    local file, text = line:match("^(.-):(.*)$")
+    local ref = text and text:match("^%s*%-%s*[\"']?([^\"'%s]+)")
+    if ref then
+      local resolved = vim.fs.normalize(vim.fs.abspath(vim.fs.joinpath(vim.fs.dirname(file), ref))):gsub("/$", "")
+      if resolved == target and not seen[file] then
+        seen[file] = true
+        table.insert(children, vim.fs.normalize(vim.fs.abspath(file)))
       end
-    end)
+    end
+  end
+  return children
+end
+
+---opens a kustomization that references the current buffer's directory
+M.children = function()
+  local children = M.find_children()
+  if #children == 0 then
+    utils.warn("could not find a child kustomization")
+  else
+    edit_one_of(children, "Select child kustomization:")
   end
 end
 

@@ -14,6 +14,8 @@ M.set_default_mappings = function()
 
   vim.keymap.set("n", "<leader>kp", "<cmd>KustomizeParent<cr>", { desc = "Go to parent kustomization" })
 
+  vim.keymap.set("n", "<leader>kc", "<cmd>KustomizeChildren<cr>", { desc = "Go to child kustomization" })
+
   vim.keymap.set("n", "<leader>kP", "<cmd>KustomizePrintResources<cr>", { desc = "Print resources" })
 
   vim.keymap.set("n", "<leader>kv", function()

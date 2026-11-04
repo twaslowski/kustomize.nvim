@@ -71,6 +71,13 @@ end, {
   nargs = 0,
 })
 
+vim.api.nvim_create_user_command("KustomizeChildren", function()
+  require("kustomize.resources").children()
+end, {
+  desc = "Go to a kustomization referencing the current one",
+  nargs = 0,
+})
+
 vim.api.nvim_create_user_command("KustomizeValidate", function()
   local cmd = config.options.run["validate"].cmd
   local args = config.options.run["validate"].args

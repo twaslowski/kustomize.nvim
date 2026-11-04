@@ -61,6 +61,7 @@ Run `:checkhealth kustomize` for a health check.
 | n    | \<leader\>kb | Kustomize build        | `:KustomizeBuild`          |
 | n    | \<leader\>kk | List kinds             | `:KustomizeListKinds`      |
 | n    | \<leader\>kp | Go to parent kustomization | `:KustomizeParent` |
+| n    | \<leader\>kc | Go to child kustomization | `:KustomizeChildren`    |
 | n    | \<leader\>kP | Print resources        | `:KustomizePrintResources` |
 | n    | \<leader\>kl | List resources         | `:KustomizeListResources`  |
 | n    | \<leader\>kv | Validate file          | `:KustomizeValidate`       |
